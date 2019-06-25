@@ -18,7 +18,26 @@ class UserController {
   }
 
   async update(req, res) {
-    return res.json()
+    const { email, oldPassword } = req.body
+    const user = await User.findByPk(req.userId)
+
+    if (email !== user.email) {
+      if ((await User.count({ where: { email } })) > 0) {
+        return res
+          .status(HTTP.BAD_REQUEST)
+          .json({ error: 'The e-mail is already used' })
+      }
+    }
+
+    if (oldPassword && !(await user.isPasswordCorrect(oldPassword))) {
+      return res
+        .status(HTTP.UNAUTHORIZED)
+        .json({ error: 'Credentials do not match' })
+    }
+
+    const { id, name, provider } = await user.update(req.body)
+
+    return res.json({ id, name, email, provider })
   }
 }
 
