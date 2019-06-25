@@ -16,6 +16,10 @@ class UserController {
 
     return res.status(HTTP.CREATED).json({ id, name, email, provider })
   }
+
+  async update(req, res) {
+    return res.json()
+  }
 }
 
 export default new UserController()
