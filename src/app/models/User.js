@@ -25,7 +25,7 @@ class User extends Model {
   }
 
   static associate(models) {
-    this.belongsTo(models.File, { foreignKey: 'avatar_id' })
+    this.belongsTo(models.File, { foreignKey: 'avatar_id', as: 'avatar' })
   }
 
   isPasswordCorrect(password) {
@@ -38,6 +38,7 @@ class User extends Model {
       name: this.name,
       email: this.email,
       provider: this.provider,
+      avatar: this.avatar,
     }
   }
 }
