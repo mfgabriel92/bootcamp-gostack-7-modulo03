@@ -46,7 +46,7 @@ class UserController {
       return res.status(HTTP.BAD_REQUEST).json({ error: e.errors })
     }
 
-    if (email !== user.email) {
+    if (email && email !== user.email) {
       if ((await User.count({ where: { email } })) > 0) {
         return res
           .status(HTTP.BAD_REQUEST)
