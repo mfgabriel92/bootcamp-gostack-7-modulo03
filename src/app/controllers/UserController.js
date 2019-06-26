@@ -11,7 +11,7 @@ class UserController {
    */
   async store(req, res) {
     const { body } = req
-    const user = await User.findOne({ where: { email: body.email } })
+    let user = await User.findOne({ where: { email: body.email } })
 
     try {
       await newUser.validate(req.body, { abortEarly: false })
@@ -25,9 +25,9 @@ class UserController {
         .json({ error: 'The e-mail is already used' })
     }
 
-    const { id, name, email, provider } = await User.create(body)
+    user = await User.create(body)
 
-    return res.status(HTTP.CREATED).json({ id, name, email, provider })
+    return res.status(HTTP.CREATED).json({ user })
   }
 
   /**
@@ -38,7 +38,7 @@ class UserController {
    */
   async update(req, res) {
     const { email, oldPassword } = req.body
-    const user = await User.findByPk(req.userId)
+    let user = await User.findByPk(req.userId)
 
     try {
       await updateUser.validate(req.body, { abortEarly: false })
@@ -60,9 +60,9 @@ class UserController {
         .json({ error: 'Credentials do not match' })
     }
 
-    const { id, name, provider } = await user.update(req.body)
+    user = await user.update(req.body)
 
-    return res.json({ id, name, email, provider })
+    return res.json({ user })
   }
 }
 

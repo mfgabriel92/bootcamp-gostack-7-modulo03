@@ -27,6 +27,15 @@ class User extends Model {
   isPasswordCorrect(password) {
     return bcrypt.compare(password, this.password)
   }
+
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      email: this.email,
+      provider: this.provider,
+    }
+  }
 }
 
 export default User
