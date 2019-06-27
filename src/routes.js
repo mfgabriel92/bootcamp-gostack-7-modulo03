@@ -19,6 +19,7 @@ routes.use(auth)
 routes.put('/api/users', UserController.update)
 routes.post('/api/users/avatar', upload.single('file'), FileController.store)
 routes.get('/api/providers', ProviderController.index)
+routes.get('/api/appointments', AppointmentController.index)
 routes.post('/api/appointments', AppointmentController.store)
 
 export default routes

@@ -1,13 +1,46 @@
 import { startOfHour, parseISO, isBefore } from 'date-fns'
 import Appointment from '../models/Appointment'
 import User from '../models/User'
+import File from '../models/File'
 import appointmentRules from '../../utils/validators/appointment'
 import HTTP from '../../utils/httpResponse'
 
 class AppointmentController {
-  async store(req, res) {
-    console.log(req.body)
+  /**
+   * Lists all appointments
+   *
+   * @param {Request} req
+   * @param {Response} res
+   */
+  async index(req, res) {
+    const appointments = await Appointment.findAll({
+      where: { user_id: req.userId, canceled_at: null },
+      order: ['date'],
+      include: [
+        {
+          model: User,
+          as: 'provider',
+          attributes: ['id', 'name'],
+          include: [
+            {
+              model: File,
+              as: 'avatar',
+            },
+          ],
+        },
+      ],
+    })
 
+    res.json({ appointments })
+  }
+
+  /**
+   * Creates a new appointment
+   *
+   * @param {Request} req
+   * @param {Response} res
+   */
+  async store(req, res) {
     try {
       await appointmentRules.validate(req.body, { abortEarly: false })
     } catch (e) {
