@@ -20,10 +20,15 @@ routes.use(auth)
 
 routes.put('/api/users', UserController.update)
 routes.post('/api/users/avatar', upload.single('file'), FileController.store)
+
 routes.get('/api/providers', ProviderController.index)
+
 routes.get('/api/schedules', ScheduleController.index)
+
 routes.get('/api/appointments', AppointmentController.index)
 routes.post('/api/appointments', AppointmentController.store)
+routes.delete('/api/appointments/:id', AppointmentController.delete)
+
 routes.get('/api/notifications', NotificationController.index)
 routes.put('/api/notifications/:id', NotificationController.update)
 

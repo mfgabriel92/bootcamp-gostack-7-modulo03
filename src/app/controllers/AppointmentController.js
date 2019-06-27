@@ -1,4 +1,4 @@
-import { startOfHour, parseISO, isBefore, format } from 'date-fns'
+import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns'
 import Appointment from '../models/Appointment'
 import User from '../models/User'
 import File from '../models/File'
@@ -108,6 +108,43 @@ class AppointmentController {
     })
 
     return res.status(HTTP.CREATED).json({ appointment })
+  }
+
+  /**
+   * Cancels an appointment
+   *
+   * @param {Request} req
+   * @param {Response} res
+   */
+  async delete(req, res) {
+    const { id } = req.params
+    const appointment = await Appointment.findByPk(id)
+
+    if (appointment.user_id !== req.userId) {
+      return res.status(HTTP.UNAUTHORIZED).json({
+        error: 'You do not have permission to delete this appointment',
+      })
+    }
+
+    const dateSubbed = subHours(appointment.date, 2)
+
+    if (isBefore(dateSubbed, new Date())) {
+      return res.status(HTTP.UNAUTHORIZED).json({
+        error:
+          'You cannot cancel an appointment less than 2 hours from its scheduled time',
+      })
+    }
+
+    if (appointment.canceled_at) {
+      return res.status(HTTP.UNAUTHORIZED).json({
+        error: 'The appointment has already been canceled',
+      })
+    }
+
+    appointment.canceled_at = new Date()
+    await appointment.save()
+
+    return res.json({ appointment })
   }
 }
 

@@ -25,6 +25,7 @@ class Appointment extends Model {
     return {
       id: this.id,
       date: this.date,
+      canceled_at: this.canceled_at,
       provider: this.provider,
       user: this.user,
     }
