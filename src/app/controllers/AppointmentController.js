@@ -5,6 +5,7 @@ import File from '../models/File'
 import Notification from '../schemas/Notification'
 import appointmentRules from '../../utils/validators/appointment'
 import HTTP from '../../utils/httpResponse'
+import Mail from '../../lib/Mail'
 
 class AppointmentController {
   /**
@@ -118,11 +119,31 @@ class AppointmentController {
    */
   async delete(req, res) {
     const { id } = req.params
-    const appointment = await Appointment.findByPk(id)
+    const appointment = await Appointment.findByPk(id, {
+      include: [
+        {
+          model: User,
+          as: 'provider',
+          attributes: ['name', 'email'],
+        },
+      ],
+    })
+
+    if (!appointment) {
+      return res.status(HTTP.NOT_FOUND).json({
+        error: 'Appointment not found',
+      })
+    }
 
     if (appointment.user_id !== req.userId) {
       return res.status(HTTP.UNAUTHORIZED).json({
         error: 'You do not have permission to delete this appointment',
+      })
+    }
+
+    if (appointment.canceled_at) {
+      return res.status(HTTP.UNAUTHORIZED).json({
+        error: 'The appointment has already been canceled',
       })
     }
 
@@ -135,14 +156,14 @@ class AppointmentController {
       })
     }
 
-    if (appointment.canceled_at) {
-      return res.status(HTTP.UNAUTHORIZED).json({
-        error: 'The appointment has already been canceled',
-      })
-    }
-
     appointment.canceled_at = new Date()
     await appointment.save()
+
+    await Mail.send({
+      to: `${appointment.provider.name} <${appointment.provider.email}>`,
+      subject: 'Scheduled has been canceled',
+      text: 'You have a new schedule cancelation',
+    })
 
     return res.json({ appointment })
   }
