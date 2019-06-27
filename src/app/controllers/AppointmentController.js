@@ -1,7 +1,8 @@
-import { startOfHour, parseISO, isBefore } from 'date-fns'
+import { startOfHour, parseISO, isBefore, format } from 'date-fns'
 import Appointment from '../models/Appointment'
 import User from '../models/User'
 import File from '../models/File'
+import Notification from '../schemas/Notification'
 import appointmentRules from '../../utils/validators/appointment'
 import HTTP from '../../utils/httpResponse'
 
@@ -16,7 +17,7 @@ class AppointmentController {
     const { page = 1 } = req.query
 
     const appointments = await Appointment.findAll({
-      where: { user_id: req.userId, canceled_at: null },
+      where: { user_id: req.user.id, canceled_at: null },
       order: ['date'],
       limit: 10,
       offset: (page - 1) * 10,
@@ -56,7 +57,7 @@ class AppointmentController {
       where: { id: provider_id, provider: true },
     })
 
-    if (req.userId === provider_id) {
+    if (req.user.id === provider_id) {
       return res
         .status(HTTP.BAD_REQUEST)
         .json({ error: 'You cannot create an appointment with yourself' })
@@ -90,9 +91,18 @@ class AppointmentController {
 
     // Creation
     const appointment = await Appointment.create({
-      user_id: req.userId,
+      user_id: req.user.id,
       provider_id,
       date,
+    })
+
+    // Notify provider
+    await Notification.create({
+      message: `New schedule with ${req.user.name} at ${format(
+        startingHour,
+        "Mo 'of' MMMM', at' hh:mm a"
+      )}`,
+      user: provider_id,
     })
 
     return res.status(HTTP.CREATED).json({ appointment })

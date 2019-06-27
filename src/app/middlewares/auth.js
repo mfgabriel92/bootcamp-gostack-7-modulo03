@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
 import HTTP from '../../utils/httpResponse'
+import User from '../models/User'
 
 export default async (req, res, next) => {
   const { authorization } = req.headers
@@ -17,7 +18,7 @@ export default async (req, res, next) => {
       '374h0f83741h023947d2g34g6f26349hf263'
     )
 
-    req.userId = decoded.id
+    req.user = await User.findByPk(decoded.id)
 
     return next()
   } catch (e) {

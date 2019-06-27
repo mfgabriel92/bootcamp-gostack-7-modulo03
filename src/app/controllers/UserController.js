@@ -38,7 +38,7 @@ class UserController {
    */
   async update(req, res) {
     const { email, oldPassword } = req.body
-    let user = await User.findByPk(req.userId)
+    let user = await User.findByPk(req.user.id)
 
     try {
       await updateUser.validate(req.body, { abortEarly: false })

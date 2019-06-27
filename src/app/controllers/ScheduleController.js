@@ -7,7 +7,7 @@ class ScheduleController {
   async index(req, res) {
     const isUserAProvider =
       (await User.count({
-        where: { id: req.userId, provider: true },
+        where: { id: req.user.id, provider: true },
       })) > 0
 
     if (!isUserAProvider) {
@@ -18,7 +18,7 @@ class ScheduleController {
     const parsedDate = parseISO(date)
     const appointments = await Appointment.findAll({
       where: {
-        provider_id: req.userId,
+        provider_id: req.user.id,
         canceled_at: null,
         date: {
           [Op.between]: [startOfDay(parsedDate), endOfDay(parsedDate)],
