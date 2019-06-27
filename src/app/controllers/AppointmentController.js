@@ -17,7 +17,7 @@ class AppointmentController {
     const { page = 1 } = req.query
 
     const appointments = await Appointment.findAll({
-      where: { user_id: req.user.id, canceled_at: null },
+      where: { user_id: req.userId, canceled_at: null },
       order: ['date'],
       limit: 10,
       offset: (page - 1) * 10,
@@ -51,19 +51,21 @@ class AppointmentController {
     } catch (e) {
       return res.status(HTTP.BAD_REQUEST).json({ error: e.errors })
     }
+
     const { provider_id, date } = req.body
 
-    const user = await User.findOne({
-      where: { id: provider_id, provider: true },
-    })
-
-    if (req.user.id === provider_id) {
+    if (req.userId === provider_id) {
       return res
         .status(HTTP.BAD_REQUEST)
         .json({ error: 'You cannot create an appointment with yourself' })
     }
 
-    if (!user) {
+    // Is Provider
+    const provider = await User.findOne({
+      where: { id: provider_id, provider: true },
+    })
+
+    if (!provider) {
       return res
         .status(HTTP.BAD_REQUEST)
         .json({ error: 'You may only create appointments with providers' })
@@ -91,7 +93,7 @@ class AppointmentController {
 
     // Creation
     const appointment = await Appointment.create({
-      user_id: req.user.id,
+      user_id: req.userId,
       provider_id,
       date,
     })

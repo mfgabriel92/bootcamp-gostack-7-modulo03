@@ -25,5 +25,6 @@ routes.get('/api/schedules', ScheduleController.index)
 routes.get('/api/appointments', AppointmentController.index)
 routes.post('/api/appointments', AppointmentController.store)
 routes.get('/api/notifications', NotificationController.index)
+routes.put('/api/notifications/:id', NotificationController.update)
 
 export default routes

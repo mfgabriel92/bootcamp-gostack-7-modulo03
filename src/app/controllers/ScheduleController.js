@@ -6,7 +6,11 @@ import HTTP from '../../utils/httpResponse'
 
 class ScheduleController {
   async index(req, res) {
-    if (!req.user.provider) {
+    const provider = await User.findOne({
+      where: { id: req.userId, provider: true },
+    })
+
+    if (!provider) {
       return res
         .status(HTTP.UNAUTHORIZED)
         .json({ error: 'Operation available only for providers' })
@@ -16,7 +20,7 @@ class ScheduleController {
     const parsedDate = parseISO(date)
     const appointments = await Appointment.findAll({
       where: {
-        provider_id: req.user.id,
+        provider_id: req.userId,
         canceled_at: null,
         date: {
           [Op.between]: [startOfDay(parsedDate), endOfDay(parsedDate)],

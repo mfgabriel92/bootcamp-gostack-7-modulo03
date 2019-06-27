@@ -32,10 +32,6 @@ class User extends Model {
     return bcrypt.compare(password, this.password)
   }
 
-  isUserAProvider(id) {
-    return User.count({ where: { id, provider: true } }) > 0
-  }
-
   toJSON() {
     return {
       id: this.id,
