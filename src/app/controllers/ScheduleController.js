@@ -2,16 +2,14 @@ import { startOfDay, endOfDay, parseISO } from 'date-fns'
 import { Op } from 'sequelize'
 import Appointment from '../models/Appointment'
 import User from '../models/User'
+import HTTP from '../../utils/httpResponse'
 
 class ScheduleController {
   async index(req, res) {
-    const isUserAProvider =
-      (await User.count({
-        where: { id: req.user.id, provider: true },
-      })) > 0
-
-    if (!isUserAProvider) {
-      return res.send()
+    if (!req.user.provider) {
+      return res
+        .status(HTTP.UNAUTHORIZED)
+        .json({ error: 'Operation available only for providers' })
     }
 
     const { date } = req.query
