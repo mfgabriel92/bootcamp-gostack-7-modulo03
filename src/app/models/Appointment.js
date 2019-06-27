@@ -26,6 +26,7 @@ class Appointment extends Model {
       id: this.id,
       date: this.date,
       provider: this.provider,
+      user: this.user,
     }
   }
 }
