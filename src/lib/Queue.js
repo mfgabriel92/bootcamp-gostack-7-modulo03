@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import Bee from 'bee-queue'
 import CancelationMail from '../app/jobs/CancelationMail'
 import redisConfig from '../config/redis'

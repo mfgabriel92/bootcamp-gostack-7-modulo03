@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import { resolve } from 'path'
 import * as Sentry from '@sentry/node'
@@ -35,8 +36,14 @@ class App {
 
   exceptions() {
     this.server.use(async (err, req, res, next) => {
-      const errors = await new Youch(err, req).toJSON()
-      return res.status(HTTP.INTERNAL_SERVER_ERROR).json({ errors })
+      if (process.env.NODE_ENV === 'development') {
+        const errors = await new Youch(err, req).toJSON()
+        return res.status(HTTP.INTERNAL_SERVER_ERROR).json({ errors })
+      }
+
+      return res
+        .status(HTTP.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal server error' })
     })
   }
 }
