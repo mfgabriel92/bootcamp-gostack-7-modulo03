@@ -1,4 +1,13 @@
-import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns'
+import {
+  startOfHour,
+  parseISO,
+  isBefore,
+  format,
+  subHours,
+  subMinutes,
+  addMinutes,
+} from 'date-fns'
+import { Op } from 'sequelize'
 import Appointment from '../models/Appointment'
 import User from '../models/User'
 import File from '../models/File'
@@ -75,6 +84,8 @@ class AppointmentController {
 
     // Is before today
     const startingHour = startOfHour(parseISO(date))
+    const oneHourBefore = subMinutes(parseISO(date), 30)
+    const oneHourAfter = addMinutes(parseISO(date), 30)
 
     if (isBefore(startingHour, new Date())) {
       return res
@@ -83,11 +94,17 @@ class AppointmentController {
     }
 
     // Availability
-    const appointmentDate = await Appointment.count({
-      where: { provider_id, canceled_at: null, date: startingHour },
+    const existingAppointment = await Appointment.findOne({
+      where: {
+        provider_id,
+        canceled_at: null,
+        date: {
+          [Op.between]: [oneHourBefore, oneHourAfter],
+        },
+      },
     })
 
-    if (appointmentDate > 0) {
+    if (existingAppointment) {
       return res
         .status(HTTP.BAD_REQUEST)
         .json({ error: 'The selected date is not available' })
@@ -101,8 +118,10 @@ class AppointmentController {
     })
 
     // Notify provider
+    const user = await User.findByPk(req.userId)
+
     await Notification.create({
-      message: `New schedule with ${req.user.name} at ${format(
+      message: `New schedule with ${user.name} at ${format(
         startingHour,
         "Mo 'of' MMMM', at' hh:mm a"
       )}`,

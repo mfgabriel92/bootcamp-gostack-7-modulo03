@@ -6,6 +6,7 @@ import SessionController from './app/controllers/SessionController'
 import UserController from './app/controllers/UserController'
 import FileController from './app/controllers/FileController'
 import ProviderController from './app/controllers/ProviderController'
+import AvailableController from './app/controllers/AvailableController'
 import AppointmentController from './app/controllers/AppointmentController'
 import ScheduleController from './app/controllers/ScheduleController'
 import NotificationController from './app/controllers/NotificationController'
@@ -22,6 +23,7 @@ routes.put('/api/users', UserController.update)
 routes.post('/api/users/avatar', upload.single('file'), FileController.store)
 
 routes.get('/api/providers', ProviderController.index)
+routes.get('/api/providers/:id/available', AvailableController.index)
 
 routes.get('/api/schedules', ScheduleController.index)
 
