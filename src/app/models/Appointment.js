@@ -1,4 +1,5 @@
 import Sequelize, { Model } from 'sequelize'
+import { isBefore, subHours } from 'date-fns'
 
 class Appointment extends Model {
   static init(sequelize) {
@@ -7,6 +8,18 @@ class Appointment extends Model {
         provider_id: Sequelize.INTEGER,
         date: Sequelize.DATE,
         canceled_at: Sequelize.DATE,
+        past: {
+          type: Sequelize.VIRTUAL,
+          get() {
+            return isBefore(this.date, new Date())
+          },
+        },
+        cancelable: {
+          type: Sequelize.VIRTUAL,
+          get() {
+            return isBefore(new Date(), subHours(this.date, 2))
+          },
+        },
       },
       {
         sequelize,
@@ -24,6 +37,8 @@ class Appointment extends Model {
   toJSON() {
     return {
       id: this.id,
+      past: this.past,
+      cancelable: this.cancelable,
       date: this.date,
       canceled_at: this.canceled_at,
       provider: this.provider,
