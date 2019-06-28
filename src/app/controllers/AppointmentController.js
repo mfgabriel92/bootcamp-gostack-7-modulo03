@@ -5,7 +5,8 @@ import File from '../models/File'
 import Notification from '../schemas/Notification'
 import appointmentRules from '../../utils/validators/appointment'
 import HTTP from '../../utils/httpResponse'
-import Mail from '../../lib/Mail'
+import Queue from '../../lib/Queue'
+import CancelationMail from '../jobs/CancelationMail'
 
 class AppointmentController {
   /**
@@ -157,13 +158,9 @@ class AppointmentController {
     }
 
     appointment.canceled_at = new Date()
-    await appointment.save()
 
-    await Mail.send({
-      to: `${appointment.provider.name} <${appointment.provider.email}>`,
-      subject: 'Scheduled has been canceled',
-      text: 'You have a new schedule cancelation',
-    })
+    await appointment.save()
+    await Queue.createJob(CancelationMail.key, { appointment })
 
     return res.json({ appointment })
   }
