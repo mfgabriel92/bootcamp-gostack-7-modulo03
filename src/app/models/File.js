@@ -4,6 +4,7 @@ class File extends Model {
   static init(sequelize) {
     super.init(
       {
+        id: Sequelize.NUMBER,
         name: Sequelize.STRING,
         path: Sequelize.STRING,
         url: {
@@ -23,8 +24,9 @@ class File extends Model {
 
   toJSON() {
     return {
-      name: this.name,
-      path: this.path,
+      id: this.id,
+      // name: this.name,
+      // path: this.path,
       url: this.url,
     }
   }

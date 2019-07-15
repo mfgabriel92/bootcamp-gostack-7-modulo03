@@ -30,7 +30,7 @@ class ScheduleController {
       include: {
         model: User,
         as: 'user',
-        attributes: ['id', 'name', 'email'],
+        attributes: ['id', 'name'],
       },
     })
 

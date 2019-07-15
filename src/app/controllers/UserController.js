@@ -1,4 +1,5 @@
 import User from '../models/User'
+import File from '../models/File'
 import HTTP from '../../utils/httpResponse'
 import { newUser, updateUser } from '../../utils/validators/user'
 
@@ -60,7 +61,16 @@ class UserController {
         .json({ error: 'Credentials do not match' })
     }
 
-    user = await user.update(req.body)
+    await user.update(req.body)
+
+    user = await User.findByPk(req.userId, {
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+        },
+      ],
+    })
 
     return res.json({ user })
   }
