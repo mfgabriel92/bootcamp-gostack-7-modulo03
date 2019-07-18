@@ -4,13 +4,11 @@ class File extends Model {
   static init(sequelize) {
     super.init(
       {
-        id: Sequelize.NUMBER,
         name: Sequelize.STRING,
-        path: Sequelize.STRING,
         url: {
           type: Sequelize.VIRTUAL,
           get() {
-            return `${process.env.APP_URL}/files/${this.path}`
+            return `${process.env.BASE_URL}/files/${this.name}`
           },
         },
       },
@@ -24,9 +22,7 @@ class File extends Model {
 
   toJSON() {
     return {
-      id: this.id,
-      // name: this.name,
-      // path: this.path,
+      name: this.name,
       url: this.url,
     }
   }

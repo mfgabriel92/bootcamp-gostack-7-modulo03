@@ -123,7 +123,7 @@ class AppointmentController {
     await Notification.create({
       message: `New schedule with ${user.name} at ${format(
         startingHour,
-        "Mo 'of' MMMM', at' hh:mm a"
+        "Qo 'of' MMMM', at' hh:mm a"
       )}`,
       user: provider_id,
     })

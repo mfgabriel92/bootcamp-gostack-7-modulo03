@@ -12,7 +12,7 @@ import ScheduleController from './app/controllers/ScheduleController'
 import NotificationController from './app/controllers/NotificationController'
 
 const routes = new Router()
-const upload = multer(multerConfig)
+const upload = multer(multerConfig).single('file')
 
 routes.post('/api/auth', SessionController.store)
 routes.post('/api/users', UserController.store)
@@ -20,7 +20,7 @@ routes.post('/api/users', UserController.store)
 routes.use(auth)
 
 routes.put('/api/users', UserController.update)
-routes.post('/api/users/avatar', upload.single('file'), FileController.store)
+routes.put('/api/users/avatar', upload, FileController.store)
 
 routes.get('/api/providers', ProviderController.index)
 routes.get('/api/providers/:id/available', AvailableController.index)
